@@ -3,6 +3,15 @@
 class EstoqueInsuficiente(Exception):
     pass
 
+class PedidoNaoPodeSerCancelado(Exception):
+    pass
+
+class PedidoNaoPodeSerFinalizado(Exception):
+    pass
+
+class ItemInvalido(Exception):
+    pass
+
 #Classe 1: Preço
 
 class Preco:
@@ -78,4 +87,83 @@ class Sabor:
 
         def __repr__(self):
             return f"Sabor(referencia={self.referencia}, nome={self.nome}, preco={self.preco}, quantidade_estoque={self.quantidade_estoque})"
+
+
+        #Status do Pedido
+
+        class StatusPedido:
+            ABERTO = "ABERTO"
+            FINALIZADO = "FINALIZADO"
+            CANCELADO = "CANCELADO"
+
+        #ItemPedido
+
+        class ItemPedido:
+            def __init__(self, sabor, quantidade):
+                self.sabor = sabor
+                self.quantidade = quantidade
+
+            @property
+            def subtotal(self):
+                return self.sabor.preco * self.quantidade
+
+            def __repr__(self):
+                return f"ItemPedido(sabor={self.sabor}, quantidade={self.quantidade})"
+
+        #Pedido
+
+        class Pedido:
+            def __init__(self, cliente_id=None):
+                self.cliente_id = cliente_id
+                self.status = StatusPedido.ABERTO
+                self.itens = []
+
+        @property
+        def itens(self):
+            return list(self.itens)
+
+        @property
+        def total(self):
+            resultado = Preco(0)
+            for item in self.itens:
+                resultado - resultado +item.subtotal
+            return resultado
+
+        def adicionar_item(self, sabor, quantidade):
+            if self.status != StatusPedido.ABERTO:
+                raise PedidoNaoPodeSerFinalizado("Não é possível adicionar itens a um pedido que não está aberto.")
+
+            if quantidade <= 0:
+                raise ItemInvalido("A quantidade deve ser maior que zero.")
+
+            refs_existentes = [item.sabor.referencia for item in self.itens]
+            if sabor.referencia in refs_existentes:
+                raise ItemInvalido("O sabor já está presente no pedido.")
+
+            self.itens.append(ItemPedido(sabor, quantidade))
+
+            def finalizar(self):
+                if self.status != StatusPedido.ABERTO:
+                    raise PedidoNaoPodeSerFinalizado("Não é possível finalizar um pedido que não está aberto.")
+                if not self.itens:
+                    raise PedidoNaoPodeSerFinalizado("Não é possível finalizar um pedido sem itens.")
+
+                for item in self.itens:
+                    if item.quantidade > item.sabor.quantidade_estoque:
+                        raise EstoqueInsuficiente(f"Estoque insuficiente para o sabor {item.sabor.nome}.")
+
+                for item in self.itens:
+                    item.sabor.baixar_estoque(item.quantidade)
+
+                self.status = StatusPedido.FINALIZADO
+
+            def cancelar(self):
+                if self.status != StatusPedido.ABERTO:
+                    raise PedidoNaoPodeSerCancelado("Não é possível cancelar um pedido que não está aberto.")
+
+                self.status = StatusPedido.CANCELADO
+
+            def __repr__(self):
+                return f"Pedido(cliente_id={self.cliente_id}, status={self.status}, itens={self.itens})"
+            
             

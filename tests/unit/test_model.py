@@ -90,5 +90,3 @@ def test_repor_estoque_zero_levanta_erro():
     sabor = Sabor("REF001", "Chocolate", Preco(250), 10)
     with pytest.raises(ValueError):
         sabor.repor_estoque(0)
-
-
