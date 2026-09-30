@@ -60,7 +60,7 @@ def test_sabor_valido():
     sabor = Sabor("REF001", "Chocolate", Preco(250), 10)
     assert sabor.referencia == "REF001"
     assert sabor.nome == "Chocolate"
-    assert sabor.preco_reais == 250
+    assert sabor.preco.reais == 2.50
     assert sabor.quantidade_estoque == 10
 
 def test_sabor_sem_referencia_levanta_erro():
@@ -78,7 +78,7 @@ def test_baixar_estoque_normal():
 
 def test_baixar_estoque_zero_levanta_erro():
     sabor = Sabor("REF001", "Chocolate", Preco(250), 10)
-    with pytest.raises(EstoqueInsuficiente):
+    with pytest.raises(ValueError):
         sabor.baixar_estoque(0)
 
 def test_baixar_estoque_insuficiente_levanta_erro():
@@ -110,7 +110,7 @@ def test_pedido_com_dois_itens():
     pedido.adicionar_item(sabor1, 2)
     pedido.adicionar_item(sabor2, 1)
     assert len(pedido.itens) == 2
-    assert pedido.total == Preco(700)  # 2*250 + 1*200 = 700
+    assert pedido.total == Preco(700) 
 
 def test_pedido_sem_itens_total_zero():
     pedido = Pedido()
@@ -122,21 +122,21 @@ def test_nao_aceita_sabor_duplicado_no_pedido():
     pedido = Pedido()
     pedido.adicionar_item(sabor, 2)
     with pytest.raises(ItemInvalido):
-        pedido.adicionar_item(sabor, 1)  # Tentativa de adicionar o mesmo sabor novamente
+        pedido.adicionar_item(sabor, 1) 
 
 def test_estoque_nao_muda_se_um_item_falhar():
-    sabor = Sabor("REF001", "Chocolate", Preco(250), 10)
+    sabor = Sabor("REF001", "Chocolate", Preco(250), 3)
     pedido = Pedido()
-    pedido.adicionar_item(sabor, 5)  # Estoque agora é 5
+    pedido.adicionar_item(sabor, 5)
     with pytest.raises(EstoqueInsuficiente):
         pedido.finalizar()
-    assert sabor.quantidade_estoque == 5  # Estoque não deve ter mudado
+    assert sabor.quantidade_estoque == 3
 
 def test_nao_aceita_quantidade_zero_no_item():
     sabor = Sabor("REF001", "Chocolate", Preco(250), 10)
     pedido = Pedido()
     with pytest.raises(ItemInvalido):
-        pedido.adicionar_item(sabor, 0)  # Tentativa de adicionar quantidade zero
+        pedido.adicionar_item(sabor, 0) 
 
 def test_finalizar_pedido_debita_estoque():
     sabor = Sabor("REF001", "Chocolate", Preco(250), 10)
@@ -153,7 +153,7 @@ def test_finalizar_pedido_sem_itens_levanta_erro():
 def test_finalizar_pedido_com_estoque_insuficiente():
     sabor = Sabor("REF001", "Chocolate", Preco(250), 1)
     pedido = Pedido()
-    pedido.adicionar_item(sabor, 2)  # Tentativa de adicionar mais do que o estoque
+    pedido.adicionar_item(sabor, 2)  
     with pytest.raises(EstoqueInsuficiente):
         pedido.finalizar()
-    assert sabor.quantidade_estoque == 1  # Estoque não deve ter mudado
+    assert sabor.quantidade_estoque == 1 
