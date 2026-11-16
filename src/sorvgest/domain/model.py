@@ -165,5 +165,65 @@ class Pedido:
 
     def __repr__(self):
         return f"Pedido(cliente_id={self.cliente_id}, status={self.status}, itens={self.itens})"
+
+class SaldoInsuficiente(Exception):
+    pass
             
-        
+#Cliente
+
+class Cliente:
+    def __init__(self, cliente_id, nome):
+        if not cliente_id:
+            raise ValueError("O id do cliente nao pode ser vazio.")
+        if not nome:
+            raise ValueError("O nome do cliente nao pode ser vazio.")
+
+        self.cliente_id = cliente_id
+        self.nome = nome
+
+    def __eq__(self, outro):
+        if isinstance(outro, Cliente):
+            return self.cliente_id == outro.cliente_id
+        return False
+
+    def __hash__(self):
+        return hash(self.cliente_id)
+
+    def __repr__(self):
+        return f"Cliente(cliente_id={self.cliente_id}, nome={self.nome})"
+
+
+#ContaFidelidade
+
+class ContaFidelidade:
+    """Agregado: o saldo de pontos nunca fica negativo e o resgate exige saldo suficiente."""
+
+    def __init__(self, cliente_id, saldo=0):
+        if not cliente_id:
+            raise ValueError("A conta precisa estar associada a um cliente.")
+        if saldo < 0:
+            raise ValueError("O saldo inicial nao pode ser negativo.")
+
+        self.cliente_id = cliente_id
+        self._saldo = saldo
+
+    @property
+    def saldo(self):
+        return self._saldo
+
+    def acumular(self, pontos):
+        if pontos <= 0:
+            raise ValueError("A quantidade de pontos a acumular deve ser maior que zero.")
+
+        self._saldo += pontos
+
+    def resgatar(self, pontos):
+        if pontos <= 0:
+            raise ValueError("A quantidade de pontos a resgatar deve ser maior que zero.")
+        if pontos > self._saldo:
+            raise SaldoInsuficiente("Saldo de pontos insuficiente para o resgate.")
+
+        self._saldo -= pontos
+
+    def __repr__(self):
+        return f"ContaFidelidade(cliente_id={self.cliente_id}, saldo={self._saldo})"
