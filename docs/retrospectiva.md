@@ -17,12 +17,6 @@ na prática e a decisão final.
 | **R1:** o `Pedido` altera o estoque de outro agregado | **Parcialmente mitigado.** A refatoração SOLID tirou a regra de dentro do `Pedido` (`BaixaDeEstoque`), mas o estoque continua no `Sabor` e o risco de concorrência continua. |
 | **R2:** a atomicidade depende de disciplina | **Não testado.** Nenhum caso de uso novo foi criado na Fase 2, então o risco continua igual. |
 
-Uma reavaliação: no cenário QA3, usei "trocar SQLite por PostgreSQL" como exemplo de
-modificabilidade. Revendo, é um exemplo fraco: com o SQLAlchemy, essa troca é quase
-só mudar a URL do banco em qualquer arquitetura, inclusive no Active Record. O que
-de fato diferencia a arquitetura atual é o outro exemplo do cenário, o caso de uso
-novo (evidência 4), e as refatorações da Fase 2 que ficaram restritas ao domínio.
-
 ## 2. As camadas ajudaram ou atrapalharam?
 
 **Ajudaram nas refatorações.** As duas mudanças da Fase 2 aconteceram dentro do
