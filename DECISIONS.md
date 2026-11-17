@@ -140,3 +140,38 @@ persistência, e os testes de integração e e2e passaram sem alteração.
 Usei o Claude (Anthropic), no modo Cowork, neste checkpoint. Inicialmente, estava em dúvida entre a implementação do Strategy e o State, que foi tirada com a ajuda da IA, me fazendo optar pelo state na implementação do pedido. pedi para a IA gerar a primeira versão do código do padrão (as classes de estado e as mudanças no `Pedido`), dos
 testes e a estrutura do `docs/gof.md`. Como nas fases anteriores, a responsabilidade pelo
 conteúdo é minha.
+
+## Entrega final — Frameworks e retrospectiva
+
+### Raphael Mendes Miranda Fernandes (@Raphael-Mendes) — todos os agregados
+
+**O que eu fiz**
+
+- Escrevi o `docs/frameworks.md`: o papel do Flask, do SQLAlchemy e do pytest, três
+  pontos de inversão de controle, cinco padrões usados pelos frameworks localizados
+  no código e a comparação com o Django.
+- Escrevi o `docs/retrospectiva.md`, revisitando os atributos, trade-offs e riscos
+  do checkpoint 1 com evidências do histórico da Fase 2.
+- Completei este `DECISIONS.md` com a reflexão final.
+
+**Arquivos:** `docs/frameworks.md`, `docs/retrospectiva.md`, `DECISIONS.md`
+
+**Commits**
+
+- `897a427` — 17/11 — docs/frameworks.md
+- `9dbe8b6` — 17/11 — docs/retrospectiva.md
+
+**Decisão: arquitetura híbrida, simplificando os repositórios**
+
+2026-11-17
+
+Na retrospectiva, decidi manter o domínio isolado e a camada de serviço, mas
+simplificar os repositórios. Considerei trocar pelo Active Record, que seria mais
+simples, mas as duas mudanças da Fase 2 só ficaram restritas ao domínio graças à
+separação entre regra e persistência. Já as 12 classes de `repository.py` não foram
+usadas nem alteradas em nenhuma refatoração, e por isso são a parte que eu enxugaria.
+
+**Uso de IA**
+
+Usei o Claude (Anthropic), no modo Cowork, nesta entrega. A IA estruturou a base do que mandei para a criação da primeira versão do `docs/frameworks.md` e do `docs/retrospectiva.md`, revisei e fiz as alterações necessárias. A
+responsabilidade pelo conteúdo é minha.
