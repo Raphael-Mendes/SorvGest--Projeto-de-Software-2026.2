@@ -113,7 +113,8 @@ class ItemPedido:
 #Pedido
 
 class Pedido:
-    def __init__(self, cliente_id=None):
+    def __init__(self, cliente_id=None, pedido_id=None):
+        self.pedido_id = pedido_id
         self.cliente_id = cliente_id
         self.status = StatusPedido.ABERTO
         self._itens = []
