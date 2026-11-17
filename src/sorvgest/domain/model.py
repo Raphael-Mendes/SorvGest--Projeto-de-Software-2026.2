@@ -135,6 +135,55 @@ class BaixaNoSabor(BaixaDeEstoque):
 
         for item in itens:
             item.sabor.baixar_estoque(item.quantidade)
+
+#Pedido
+#Estados do Pedido (padrão State)
+
+class EstadoPedido:
+    """Estado do ciclo de vida do Pedido. Por padrão, nenhuma operação é permitida."""
+
+    nome = None
+
+    def adicionar_item(self, pedido, sabor, quantidade):
+        raise PedidoNaoPodeSerFinalizado("Nao e possivel adicionar itens a um pedido que nao esta aberto.")
+
+    def finalizar(self, pedido, baixa_de_estoque):
+        raise PedidoNaoPodeSerFinalizado("Não é possível finalizar um pedido que não está aberto.")
+
+    def cancelar(self, pedido):
+        raise PedidoNaoPodeSerCancelado("Não é possível cancelar um pedido que não está aberto.")
+
+
+class PedidoAberto(EstadoPedido):
+    nome = StatusPedido.ABERTO
+
+    def adicionar_item(self, pedido, sabor, quantidade):
+        pedido._incluir_item(sabor, quantidade)
+
+    def finalizar(self, pedido, baixa_de_estoque):
+        if not pedido.itens:
+            raise PedidoNaoPodeSerFinalizado("Não é possível finalizar um pedido sem itens.")
+
+        baixa = baixa_de_estoque or BaixaNoSabor()
+        baixa.baixar(pedido.itens)
+
+        pedido._mudar_para(PedidoFinalizado.nome)
+
+    def cancelar(self, pedido):
+        pedido._mudar_para(PedidoCancelado.nome)
+
+
+class PedidoFinalizado(EstadoPedido):
+    nome = StatusPedido.FINALIZADO
+
+
+class PedidoCancelado(EstadoPedido):
+    nome = StatusPedido.CANCELADO
+
+
+_ESTADOS = {estado.nome: estado for estado in (PedidoAberto(), PedidoFinalizado(), PedidoCancelado())}
+
+
 #Pedido
 
 class Pedido:
@@ -143,6 +192,10 @@ class Pedido:
         self.cliente_id = cliente_id
         self.status = StatusPedido.ABERTO
         self._itens = []
+
+    @property
+    def estado(self):
+        return _ESTADOS[self.status]
 
     @property
     def itens(self):
@@ -156,9 +209,15 @@ class Pedido:
         return resultado
 
     def adicionar_item(self, sabor, quantidade):
-        if self.status != StatusPedido.ABERTO:
-            raise PedidoNaoPodeSerFinalizado("Nao e possivel adicionar itens a um pedido que nao esta aberto.")
+        self.estado.adicionar_item(self, sabor, quantidade)
 
+    def finalizar(self, baixa_de_estoque=None):
+        self.estado.finalizar(self, baixa_de_estoque)
+
+    def cancelar(self):
+        self.estado.cancelar(self)
+
+    def _incluir_item(self, sabor, quantidade):
         if quantidade <= 0:
             raise ItemInvalido("A quantidade deve ser maior que zero.")
 
@@ -168,22 +227,8 @@ class Pedido:
 
         self._itens.append(ItemPedido(sabor, quantidade))
 
-    def finalizar(self, baixa_de_estoque=None):
-        if self.status != StatusPedido.ABERTO:
-            raise PedidoNaoPodeSerFinalizado("Não é possível finalizar um pedido que não está aberto.")
-        if not self.itens:
-            raise PedidoNaoPodeSerFinalizado("Não é possível finalizar um pedido sem itens.")
-
-        baixa = baixa_de_estoque or BaixaNoSabor()
-        baixa.baixar(self.itens)
-
-        self.status = StatusPedido.FINALIZADO
-
-    def cancelar(self):
-        if self.status != StatusPedido.ABERTO:
-            raise PedidoNaoPodeSerCancelado("Não é possível cancelar um pedido que não está aberto.")
-
-        self.status = StatusPedido.CANCELADO
+    def _mudar_para(self, status):
+        self.status = status
 
     def __repr__(self):
         return f"Pedido(cliente_id={self.cliente_id}, status={self.status}, itens={self.itens})"
