@@ -63,3 +63,42 @@ Usei o Claude (Anthropic), no modo Cowork, com acesso de leitura à pasta do pro
 - Revisar e detectar a existência de erros e a completude das etapas antes de cada commit.
 
 Revisei tudo o que foi commitado, e a responsabilidade pelo conteúdo é minha.
+
+## Checkpoint 2 — Refatoração SOLID
+
+### Raphael Mendes Miranda Fernandes (@Raphael-Mendes) — todos os agregados
+
+**O que eu fiz**
+
+- Identifiquei no `Pedido.finalizar` (código do commit `de51790`, de 29/09) uma
+  violação de SRP, DIP e OCP: o pedido conferia e baixava o estoque lendo
+  diretamente um atributo do `Sabor`.
+- Extraí a regra para a abstração `BaixaDeEstoque`, com a implementação padrão
+  `BaixaNoSabor`, e criei `Sabor.tem_estoque_para`.
+- Escrevi 4 testes novos para a refatoração.
+- Escrevi o `docs/solid.md`.
+
+**Arquivos:** `src/sorvgest/domain/model.py`, `tests/unit/test_baixa_estoque.py`,
+`docs/solid.md`, `DECISIONS.md`
+
+**Commits**
+
+- `4d71bfb` — 17/11 — refatoração da baixa de estoque
+- `32e791c` — 17/11 — docs/solid.md
+
+**Decisão: manter `finalizar()` sem argumentos, com a BaixaNoSabor como padrão**
+
+2026-11-17
+
+O `finalizar` passou a aceitar uma `BaixaDeEstoque` por parâmetro, mas usa a
+`BaixaNoSabor` quando nenhuma é passada. Considerei tornar o parâmetro obrigatório,
+o que deixaria o DIP completo, mas isso obrigaria a alterar os testes da Fase 1 e a
+camada de serviço. Mantendo o padrão, os 26 testes da Fase 1 continuaram passando
+sem nenhuma alteração, que era a garantia de que o comportamento não mudou. O custo
+é o `Pedido` ainda conhecer uma implementação concreta, registrado no `solid.md`.
+
+**Uso de IA**
+
+Usei o Claude (Anthropic), no modo Cowork, neste checkpoint. Após eu identificar o rompimento dos principios SOLID, pedi para A IA gerar a primeira versão do
+código com o problema corrigido e dos testes novos. Além disso, pedi pra ia estruturar a segunda parte do DECISIONS.md e do SOLID.md, com as informações que detectei e passei.
+Por fim, pedi para ela revisar todo o conteudo entre todo os commits, para garantir que estava tudo feito e sem erros. como na primeira parte, a responsabilidade pelo conteúdo é minha.
