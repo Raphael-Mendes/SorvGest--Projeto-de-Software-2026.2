@@ -175,3 +175,20 @@ usadas nem alteradas em nenhuma refatoração, e por isso são a parte que eu en
 
 Usei o Claude (Anthropic), no modo Cowork, nesta entrega. A IA estruturou a base do que mandei para a criação da primeira versão do `docs/frameworks.md` e do `docs/retrospectiva.md`, revisei e fiz as alterações necessárias. A
 responsabilidade pelo conteúdo é minha.
+
+**Reflexão**
+
+A principal lição da Fase 2 foi aprender os padrões de projeto que podem ser
+aplicados. Antes, o importante era apenas gerar código e me certificar de que ele
+estivesse funcionando. Ao utilizar os padrões arquiteturais e de projeto e aplicar
+os princípios SOLID, ficou perceptível na prática o impacto, principalmente na
+legibilidade e na expansão do código. Na Fase 1, houve um momento em que foi
+necessário expandir as funcionalidades, e tive uma dificuldade bem maior do que
+agora na Fase 2, quando existia de fato um padrão a ser seguido, principalmente
+porque eu já sabia onde cada coisa deveria estar e como expandir. Um exemplo foi o
+padrão State: ele mudou só o `model.py`, e todos os testes anteriores continuaram
+passando sem alteração. O que eu faria diferente, com certeza, é aplicar esses
+padrões de arquitetura desde o início, o que me ajudaria bastante ao longo do
+desenvolvimento. Em relação à Fase 1, também planejaria melhor os casos de uso
+desde o princípio, pois no início da Fase 2 tive que rever grande parte desse
+aspecto.
