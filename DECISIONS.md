@@ -102,3 +102,41 @@ sem nenhuma alteração, que era a garantia de que o comportamento não mudou. O
 Usei o Claude (Anthropic), no modo Cowork, neste checkpoint. Após eu identificar o rompimento dos principios SOLID, pedi para A IA gerar a primeira versão do
 código com o problema corrigido e dos testes novos. Além disso, pedi pra ia estruturar a segunda parte do DECISIONS.md e do SOLID.md, com as informações que detectei e passei.
 Por fim, pedi para ela revisar todo o conteudo entre todo os commits, para garantir que estava tudo feito e sem erros. como na primeira parte, a responsabilidade pelo conteúdo é minha.
+
+## Checkpoint 3 — Padrão GoF
+
+### Raphael Mendes Miranda Fernandes (@Raphael-Mendes) — todos os agregados
+
+**O que eu fiz**
+
+- Apliquei o padrão **State** ao ciclo de vida do `Pedido`: os três `if` sobre o
+  status foram substituídos pelas classes `EstadoPedido`, `PedidoAberto`,
+  `PedidoFinalizado` e `PedidoCancelado`.
+- Mantive a `BaixaDeEstoque` da refatoração SOLID, que agora é usada pelo
+  `PedidoAberto` ao finalizar.
+- Escrevi 8 testes para o padrão, sem alterar os testes anteriores.
+- Escrevi o `docs/gof.md`, com o diagrama de classes em Mermaid.
+
+**Arquivos:** `src/sorvgest/domain/model.py`, `tests/unit/test_estado_pedido.py`,
+`docs/gof.md`, `DECISIONS.md`
+
+**Commits**
+
+- `0ab6418` — 17/11 — padrão State no ciclo de vida do Pedido
+- `e29b4f4` — 17/11 — docs/gof.md
+
+**Decisão: o estado é derivado do status gravado, não guardado como objeto**
+
+2026-11-17
+
+O `Pedido` continua guardando o `status` como texto, e o estado é obtido dele pelo
+dicionário `_ESTADOS`. Considerei guardar o objeto de estado direto no pedido, mas
+isso obrigaria a mudar o mapeamento em `orm.py` e a reconstruir o estado ao
+carregar do banco. Derivando do texto, o padrão não exigiu nenhuma mudança na
+persistência, e os testes de integração e e2e passaram sem alteração.
+
+**Uso de IA**
+
+Usei o Claude (Anthropic), no modo Cowork, neste checkpoint. Inicialmente, estava em dúvida entre a implementação do Strategy e o State, que foi tirada com a ajuda da IA, me fazendo optar pelo state na implementação do pedido. pedi para a IA gerar a primeira versão do código do padrão (as classes de estado e as mudanças no `Pedido`), dos
+testes e a estrutura do `docs/gof.md`. Como nas fases anteriores, a responsabilidade pelo
+conteúdo é minha.
