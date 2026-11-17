@@ -12,7 +12,7 @@ Sistema para gerenciar pedidos, estoque de sabores/insumos e programa de fidelid
 
 | Integrante | GitHub | Módulo |
 |---|---|---|
-| Raphael Mendes Miranda Fernandes | @raphael-mendes | Todo o projeto |
+| Raphael Mendes Miranda Fernandes | @raphael-mendes | Todos os agregados (Pedido, Estoque, ContaFidelidade) — trabalho individual|
 
 ---
 
@@ -20,13 +20,17 @@ Sistema para gerenciar pedidos, estoque de sabores/insumos e programa de fidelid
 
 - Python 3
 - pytest
+- Flask
+- SQLAlchemy
 
 ---
 
 ## Como executar
 
 ```bash
-python -m pytest tests/unit/test_model.py -v
+pip install -r requirements.txt
+python -m pytest -v
+flask --app "sorvgest.entrypoints.flask_app:create_app" run
 ```
 
 ---
@@ -35,10 +39,16 @@ python -m pytest tests/unit/test_model.py -v
 
 ```
 src/sorvgest/
-└── domain/
-    └── model.py          # Entidades, objetos de valor e agregados
+├── domain/model.py              # Entidades, objetos de valor e agregados
+├── adapters/
+│   ├── orm.py                   # Mapeamento imperativo SQLAlchemy
+│   └── repository.py            # Repositórios: abstrato, testes e SQLAlchemy
+├── service_layer/services.py    # Casos de uso
+└── entrypoints/flask_app.py     # Flask
 
 tests/
-└── unit/
-    └── test_model.py     # Testes do modelo de domínio
+├── conftest.py                  # Fixtures: SQLite em memória e mapeamento
+├── unit/                        # Domínio e serviços (para testes)
+├── integration/                 # Repositórios reais
+└── e2e/                         # API Flask
 ```
