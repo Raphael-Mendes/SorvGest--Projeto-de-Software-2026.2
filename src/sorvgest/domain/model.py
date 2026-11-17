@@ -1,3 +1,5 @@
+
+import abc
 #Exceções:
 
 class EstoqueInsuficiente(Exception):
@@ -77,6 +79,9 @@ class Sabor:
 
         self.quantidade_estoque -= quantidade
 
+    def tem_estoque_para(self, quantidade):
+        return quantidade <= self.quantidade_estoque
+
     def repor_estoque(self, quantidade):
         if quantidade < 0:
             raise ValueError("A quantidade a repor não pode ser negativa.")
@@ -110,6 +115,26 @@ class ItemPedido:
     def __repr__(self):
         return f"ItemPedido(sabor={self.sabor}, quantidade={self.quantidade})"
 
+#Baixa de estoque
+
+class BaixaDeEstoque(abc.ABC):
+    """Abstração da qual o Pedido depende para baixar o estoque dos seus itens."""
+
+    @abc.abstractmethod
+    def baixar(self, itens):
+        raise NotImplementedError
+
+
+class BaixaNoSabor(BaixaDeEstoque):
+    """Regra padrão: confere o estoque de todos os itens e só então baixa (tudo ou nada)."""
+
+    def baixar(self, itens):
+        for item in itens:
+            if not item.sabor.tem_estoque_para(item.quantidade):
+                raise EstoqueInsuficiente(f"Estoque insuficiente para o sabor {item.sabor.nome}.")
+
+        for item in itens:
+            item.sabor.baixar_estoque(item.quantidade)
 #Pedido
 
 class Pedido:
@@ -143,18 +168,14 @@ class Pedido:
 
         self._itens.append(ItemPedido(sabor, quantidade))
 
-    def finalizar(self):
+    def finalizar(self, baixa_de_estoque=None):
         if self.status != StatusPedido.ABERTO:
             raise PedidoNaoPodeSerFinalizado("Não é possível finalizar um pedido que não está aberto.")
         if not self.itens:
             raise PedidoNaoPodeSerFinalizado("Não é possível finalizar um pedido sem itens.")
 
-        for item in self.itens:
-            if item.quantidade > item.sabor.quantidade_estoque:
-                raise EstoqueInsuficiente(f"Estoque insuficiente para o sabor {item.sabor.nome}.")
-
-        for item in self.itens:
-            item.sabor.baixar_estoque(item.quantidade)
+        baixa = baixa_de_estoque or BaixaNoSabor()
+        baixa.baixar(self.itens)
 
         self.status = StatusPedido.FINALIZADO
 
